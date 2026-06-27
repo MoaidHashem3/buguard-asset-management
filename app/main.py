@@ -1,15 +1,32 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
-from app.database import Base
-from app.database import engine
+from app.database import Base, engine
+from app.routes import assets, relationships
+from app.routes import bulk_import as import_route
 
-from app.models.asset import Asset
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(
+    title="DarkAtlas Asset Management API",
+    description="Track and manage internet-facing assets for Attack Surface Monitoring.",
+    version="1.0.0",
+)
+
+app.include_router(assets.router)
+app.include_router(relationships.router)
+app.include_router(import_route.router)
 
 
-@app.get("/")
-def root():
-    return {"message": "API Running"}
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error", "error": str(exc)},
+    )
+
+
+@app.get("/health", tags=["meta"])
+def health():
+    return {"status": "ok"}

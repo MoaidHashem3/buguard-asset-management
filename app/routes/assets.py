@@ -21,7 +21,7 @@ def list_assets(
     status: Optional[AssetStatus] = None,
     tag: Optional[str] = None,
     value_contains: Optional[str] = None,
-    sort_by: str = Query("last_seen", pattern="^(last_seen|first_seen|value|type|status)$"),
+    sort_by: str = Query("last_seen", pattern="^(last_seen|first_seen|value|type|status|id)$"),
     order: str = Query("desc", pattern="^(asc|desc)$"),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=200),
